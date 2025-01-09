@@ -1,3 +1,4 @@
 docker
 behave
-redis>=4.0.0
+behave-html-formatter
+redis

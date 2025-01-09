@@ -24,6 +24,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run behave
+    - name: Run Behave tests with reporting
       run: |
-        behave
+        behave --format html --outfile reports/behave-report.html
+  
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: reports
