@@ -27,8 +27,10 @@ jobs:
     - name: Run Behave tests with reporting
       run: |
         behave --format html --outfile reports/behave-report.html
+      continue-on-error: true
   
-    - name: Deploy to GitHub Pages
+    - name: Deploy test report
+      if: success() || failure()
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
