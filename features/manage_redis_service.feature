@@ -1,8 +1,5 @@
 Feature: Mange Redis service
-
-    As a user
-    I want to start redis service
-    So that I can test it
+    Validates if Redis service can be run
 
     Scenario: Run Redis service
         Given a Redis service is not running

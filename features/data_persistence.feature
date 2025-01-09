@@ -9,7 +9,7 @@ Feature: Data persistence
     Then the value of the key should be "value_persistent"
 
   Scenario: Data does not persist when Redis container is not configured for persistence
-    Given the Redis container is running without persistence enabled
+    Given the Redis container is running with persistence off
     When a key "key_ephemeral" is set with value "value_ephemeral" in Redis
     And the Redis container is restarted
     And a key "key_ephemeral" is retrieved from Redis
