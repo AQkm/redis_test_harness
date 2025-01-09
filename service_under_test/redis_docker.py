@@ -8,50 +8,54 @@ class RedisDocker:
         self.container_name = container_name
         self.image = image
         self.port = port
-        self.client = docker.from_env()
+        self.docker_client = docker.from_env()
+        self.redis_client = None
 
     def start(self):
         try:
-            print(f"Starting")
-            container = self.client.containers.run(
+            print(f"Starting {self.container_name} container...")
+            container = self.docker_client.containers.run(
                 self.image,
                 detach=True,
                 name=self.container_name,
-                ports={"7874/tcp": self.port},
+                ports={"6379/tcp": self.port},
             )
             for _ in range(5):
-                print(f"Witing for {self.container_name} container")
-                if self.status(): break
+                print(f"Waiting for {self.container_name} container to start...")
+                if self.status():
+                    break
                 print(".")
                 time.sleep(1)
             if self.status():
                 print(f"{self.container_name} container is running.")
+                self.redis_client = redis.StrictRedis(host="localhost", port=self.port, decode_responses=True)
                 return container
             else:
-                print(f"{self.container_name} container have been not started.")
+                print(f"{self.container_name} container did not start.")
         except docker.errors.APIError as e:
             print(f"Error starting Redis container: {e}")
             return None
 
     def status(self):
         try:
-            container = self.client.containers.get(self.container_name)
+            container = self.docker_client.containers.get(self.container_name)
             return container.status == 'running'
         except docker.errors.NotFound:
             print(f"{self.container_name} not found")
+            return False
 
     def stop(self):
         try:
-            print(f"Stopping {self.container_name} container.")
-            container = self.client.containers.get(self.container_name)
+            print(f"Stopping {self.container_name} container...")
+            container = self.docker_client.containers.get(self.container_name)
             container.stop()
-            print(f"{self.container_name} stopped")
+            print(f"{self.container_name} stopped.")
             container.remove()
-            print(f"{self.container_name} removed")
+            print(f"{self.container_name} removed.")
         except docker.errors.NotFound:
             print(f"{self.container_name} container not found.")
         except docker.errors.APIError as e:
-            print(f"Error stopping and removing container {e}")
+            print(f"Error stopping and removing container: {e}")
 
     def get_cluster_status(self):
         try:
